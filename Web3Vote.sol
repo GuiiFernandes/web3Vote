@@ -3,22 +3,20 @@
 pragma solidity ^0.8.21;
 
 struct Candidate {
-    uint id;
     string photoUrl;
     string name;
     string politicalParty;
     uint number;
+    uint votes;
 }
 
 struct Voting {
     string description;
     uint maxDate; //salva a data máxima da votação.
-    uint[] candidatesId;
-    uint[] votes;
 }
 
 struct Vote {
-    uint candidateId;
+    uint candidateNumber;
     uint date;
 }
 
@@ -26,8 +24,11 @@ contract Web3Vote {
     address owner; //guarda o endereço do dono do contrato.balance;
     uint public currentVoting = 0; //id da votação atual
     uint nextCandidateId = 0;
-    Voting[] public votings;
-    Candidate[] public candidates;
+    // Voting[] public votings;
+    mapping(uint => Voting) public votings;
+    mapping(uint => Candidate) public candidates;
+    mapping(uint => mapping(uint => Candidate)) public candidatesInVoting;
+    // Candidate[] public candidates;
     mapping(uint => mapping(address => Vote)) public votes; //Cria uma matriz de voto, assim pego votes[idVoting][address]
 
     constructor() { //Assim como em classe o constructor é chamado apenas na criação do projeto.
@@ -37,31 +38,12 @@ contract Web3Vote {
 
     function createVoting(uint timeToVote, string memory description) public {
         require(msg.sender == owner, "usuario sem permissao");
-        if (votings.length != 0) currentVoting++;
+        if (votings[0].maxDate != 0) currentVoting++;
 
         Voting memory newVoting;
         newVoting.description = description;
         newVoting.maxDate = timeToVote + block.timestamp;
-        newVoting.candidatesId = new uint[](0);
-        votings.push(newVoting);
-    }
-
-    function getVoting() public view returns (Voting memory) {
-        return votings[currentVoting];
-    }
-
-    function getVoting(uint index) public view returns (Voting memory) {
-        if(index >= votings.length) revert("Eleicao invalida, escolha uma opcao valida.");
-        return votings[index];
-    }
-
-    function getCandidates() public view returns (Candidate[] memory) {
-        return candidates;
-    }
-
-    function getCandidate(uint id) public view returns (Candidate memory) {
-        if(id > candidates.length) revert("Candidato invalido, escolha uma opcao valida.");
-        return candidates[id];
+        votings[currentVoting] = newVoting;
     }
 
     function createCandidate(string memory name, string memory photoUrl, string memory politicalParty, uint number) public {
@@ -71,31 +53,28 @@ contract Web3Vote {
         newCandidate.photoUrl = photoUrl;
         newCandidate.politicalParty = politicalParty;
         newCandidate.number = number;
-        newCandidate.id = nextCandidateId;
-        candidates.push(newCandidate);
+        candidates[nextCandidateId] = newCandidate;
         nextCandidateId++;
     }
 
     function addCandidateInVoting(uint candidateId, uint votingIndex) public {
-        if(votingIndex >= votings.length) revert("Eleicao invalida, escolha uma opcao valida.");
         require(msg.sender == owner, "usuario sem permissao");
-        for (uint i=0; i < votings[votingIndex].candidatesId.length; i++) {
-            if(candidates[votings[votingIndex].candidatesId[i]].number == candidates[candidateId].number) revert("Ja existe um candidato com esse numero para essa votacao.");
-        }
-        votings[votingIndex].candidatesId.push(candidateId);
-        votings[votingIndex].votes.push(0);
+        require(votings[votingIndex].maxDate != 0, "Eleicao invalida, escolha uma opcao valida.");
+        require(candidates[candidateId].number != 0, "Candidato nao cadastrado");
+        uint candidateNumber = candidates[candidateId].number;
+        require(candidatesInVoting[votingIndex][candidateNumber].number != candidateNumber, "Ja existe um candidato com esse numero nessa votacao");
+        
+        candidatesInVoting[votingIndex][candidateNumber] = candidates[candidateId];
     }
 
-    function addVote(uint candidateId, uint votingIndex) public {
-        require(getVoting().maxDate > block.timestamp, "votacao encerrada");
+    function addVote(uint candidateNumber, uint votingIndex) public {
+        require(votings[votingIndex].maxDate != 0, "Votacao invalida");
+        require(votings[votingIndex].maxDate > block.timestamp, "votacao encerrada");
         require(votes[votingIndex][msg.sender].date == 0, "usuario ja votou nessa votacao");
-        int indexCandidate = -1;
-        for (uint i=0; i < votings[votingIndex].candidatesId.length; i++) {
-            if(votings[votingIndex].candidatesId[i] == candidateId) indexCandidate = int(i);
-        }
-        if(indexCandidate < 0) revert("candidato nao cadastrado para essa votacao");
-        votings[votingIndex].votes[uint(indexCandidate)]++;
-        votes[votingIndex][msg.sender].candidateId = candidateId;
+        require(candidatesInVoting[votingIndex][candidateNumber].number != 0, "Numero de candidato invalido para essa votacao");
+        
+        candidatesInVoting[votingIndex][candidateNumber].votes++;
+        votes[votingIndex][msg.sender].candidateNumber = candidateNumber;
         votes[votingIndex][msg.sender].date = block.timestamp;
     }
 }
