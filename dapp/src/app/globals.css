@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,12 +18,14 @@
 }
 
 body {
+  font-family: 'Work Sans', sans-serif !important;
   display: flex;
   align-items: center;
+  font-size: 1rem;
   height: 100vh;
   justify-content: center;
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.2) 50px, rgba(0,0,0,0.8) 150px, rgba(0,0,0,0.93) 200px), url(/urna.jpeg);
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.2) 50px, rgba(0,0,0,0.8) 160px, rgba(0,0,0,0.95) 200px), url(/urna.jpeg);
   background-size: 100%;
 }
 
@@ -38,6 +41,14 @@ body {
   }
 
   .btn-login {
-    @apply bg-green-700 w-full py-2 px-5 flex-center rounded-lg gap-2 font-bold text-xl;
+    @apply bg-green-700 w-full py-1 px-4 flex-center rounded-md gap-2 font-bold text-lg max-w-[400px] m-auto;
+  }
+
+  .nav-link {
+    @apply bg-green-200 rounded-lg px-3 py-1 shadow-md font-bold text-black;
+  }
+
+  .active {
+    @apply bg-green-600 ;
   }
 }
