@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 10, 10, 10;
+  }
+}
+
+body {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  justify-content: center;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.2) 50px, rgba(0,0,0,0.8) 150px, rgba(0,0,0,0.93) 200px), url(/urna.jpeg);
+  background-size: 100%;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+
+  .btn-login {
+    @apply bg-green-700 w-full py-2 px-5 flex-center rounded-lg gap-2 font-bold text-xl;
+  }
+}
