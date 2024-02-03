@@ -29,6 +29,11 @@ body {
   background-size: 100%;
 }
 
+.swal2-confirm {
+  background-color: #159c47 !important;
+  font-weight: bold !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -50,5 +55,9 @@ body {
 
   .active {
     @apply bg-green-600 ;
+  }
+
+  .form-login {
+    @apply max-w-[600px] flex flex-col justify-center gap-10;
   }
 }

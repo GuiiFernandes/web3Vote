@@ -1,15 +1,23 @@
-/* eslint-disable max-len */
+/* eslint-disable react-hooks/exhaustive-deps */
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import { getCookie } from 'typescript-cookie';
+
 import Footer from './components/Footer';
 import Header from './components/Header';
+import FormLogin from './components/FormLogin';
+import PopUp from './components/PopUp';
 
 export default function Home() {
-  const onLogin = () => {
-    console.log('Login');
-  };
+  const [acceptCookies, setAcceptCookies] = useState<boolean>(false);
+  useEffect(() => {
+    if (acceptCookies) return;
+    const accept = !!getCookie('web3Vote');
+    setAcceptCookies(accept);
+  }, []);
 
   return (
     <>
@@ -20,20 +28,10 @@ export default function Home() {
       </Head>
       <Header />
       <main className="w-[95%] flex justify-center">
-        <form className="max-w-[600px] flex flex-col justify-center gap-10" onSubmit={ onLogin }>
-          <h1 className="text-5xl font-bold">
-            Web3 Vote
-          </h1>
-          <p>
-            Sistema de votação para simular uma urna eletrônica. Entre com sua carteira MetaMask, escolha uma eleição e vote.
-          </p>
-          <button className="btn-login">
-            <img src="/Metamask-icon.svg" alt="metamask logo" className="w-12 h-12" />
-            Conectar com MetaMask
-          </button>
-        </form>
+        <FormLogin />
       </main>
       <Footer />
+      { !acceptCookies && <PopUp setAcceptCookies={ setAcceptCookies } />}
     </>
   );
 }

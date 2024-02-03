@@ -1,10 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const pathname = usePathname();
   return (
-    <header className="w-full flex justify-center py-2 fixed top-0">
+    <header className="w-full flex justify-center py-2 fixed top-0 z-10">
       <nav className="flex gap-4 items-center max-w-[600px] w-[80%] justify-end">
         <Link
           href="/"
